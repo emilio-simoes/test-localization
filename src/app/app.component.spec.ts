@@ -1,35 +1,70 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { L10nConfig, L10nIntlModule, L10nLoader, L10nTranslationModule } from 'angular-l10n';
 import { AppComponent } from './app.component';
+import { l10nConfig } from './l1n-config';
+
+const mockAsset = {
+  en: {
+    title: 'Angular localization',
+    subtitle: 'It\'s a small world',
+    userNotifications: '{{ user }}, you have {{ NoMessages }} new messages',
+    insert: 'Insert',
+    select: 'Select',
+    strongTitle: '<strong>Angular localization</strong>',
+    strongSubtitle: '<strong>It\'s a small world</ strong >'
+  },
+  it: {
+    title: 'Localizzazione in Angular',
+    subtitle: 'Il mondo è piccolo',
+    userNotifications: '{{ user }}, tu hai {{ NoMessages }} nuovi messaggi',
+    insert: 'Inserisci',
+    select: 'Seleziona',
+    strongTitle: '<strong>Localizzazione in Angular</strong>',
+    strongSubtitle: '<strong>Il mondo è piccolo</strong>'
+  }
+};
+
+const config: L10nConfig = {
+  format: 'language',
+  providers: [
+    {
+      name: 'asset',
+      asset: mockAsset
+    }
+  ],
+  keySeparator: '.',
+  defaultLocale: { language: 'en' },
+  schema: [
+    { locale: { language: 'en' } }
+  ]
+};
 
 describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  let fixture;
+  let app;
+  let loader;
+
+  beforeEach(async () => {
+    fixture = TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        HttpClientTestingModule,
+        L10nTranslationModule.forRoot(l10nConfig),
+        L10nIntlModule
       ],
       declarations: [
         AppComponent
-      ],
-    }).compileComponents();
-  }));
+      ]
+    }).createComponent(AppComponent);
+    app = fixture.componentInstance;
+    loader = TestBed.inject(L10nLoader);
+    await loader.init();
+    fixture.detectChanges();
+  });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'test-localization'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('test-localization');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('test-localization app is running!');
   });
 });
